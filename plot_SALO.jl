@@ -6,7 +6,7 @@ using PyPlot
 Plots the value of the objective vs. the estimated (discretized) forcing frequencies by the SALO approach.
 
 _INPUT_:
-`Ls`: Values of the objective for the various values of l (rows) and k (columns). 
+`Ls`: Values of the objective for the various values of l (rows) and k (columns).
 `L`: Minimal objective value.
 `l0`: Corresponding value of l.
 `k0`: Corresponding value of k.
@@ -28,24 +28,32 @@ function plot_SALO(Ls::Matrix{Float64}, L::Float64, l0::Int64, k0::Int64, ks::Ve
 		end
 		l3 = findmax([Ls[1:l1-1,:];-1e6*ones(1,length(ks));Ls[l1+1:l2-1,:];-1e6*ones(1,length(ks));Ls[l2+1:n,:]])[2][1]
 		ll = sort([l1,l2,l3])
-	
+
 		Lred = Ls[setdiff(1:n,ll),:]
 		Lrmax = [maximum(Lred[:,i]) for i in 1:length(ks)]
 		Lrmin = [minimum(Lred[:,i]) for i in 1:length(ks)]
-	
+
 		PyPlot.fill([ks;ks[end:-1:1]]./T,[Lrmax;Lrmin[end:-1:1]],color=gra)
-		
+
 		nn = 3
 	else
 		nn = n
+		@show ll = 1:n
 	end
 
+	push!(ll, 43)
+	nn = 4
+	PyPlot.figure()
 	for l in 1:nn
-		PyPlot.plot(fs,Ls[ll[l],:],label="l = $l")
+		PyPlot.plot(fs,Ls[ll[l],:],label="l = $(ll[l])")
 	end
 	xlabel("f")
 	ylabel("Log-likelihood")
 	title("Best SALO: l = $(l0), f = $(round(k0/T,sigdigits=5)), L = $(round(L,sigdigits=5))")
+	legend()
+	axvline(0.8219, linestyle="--")
+	gcf()
+	savefig("SALO.pdf")
 end
 
 """
@@ -54,7 +62,7 @@ end
 Plots the value of the objective vs. the estimated (discretized) forcing frequencies by the SALO-relax approach.
 
 _INPUT_:
-`Ls`: Values of the objective for the various values of k. 
+`Ls`: Values of the objective for the various values of k.
 `L`: Minimal objective value.
 `k0`: Corresponding value of k.
 `ks`: Values of assessed.
@@ -74,7 +82,7 @@ end
 Plots the value of the estimated forcing amplitude vs. the agent index, obtained by the SALO-relax approach.
 
 _INPUT_:
-`Ls`: Values of the objective for the various values of k. 
+`Ls`: Values of the objective for the various values of k.
 `L`: Minimal objective value.
 `γ`: Corresponding forcing amplitudes.
 `l0`: Index with largest amplitude.
